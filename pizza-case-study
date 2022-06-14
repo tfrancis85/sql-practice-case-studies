@@ -1,0 +1,54 @@
+--Serious sql Pizza case study
+/*
+A. Pizza Metrics
+How many pizzas were ordered?
+How many unique customer orders were made?
+How many successful orders were delivered by each runner?
+How many of each type of pizza was delivered?
+How many Vegetarian and Meatlovers were ordered by each customer?
+What was the maximum number of pizzas delivered in a single order?
+For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+How many pizzas were delivered that had both exclusions and extras?
+What was the total volume of pizzas ordered for each hour of the day?
+What was the volume of orders for each day of the week?
+*/
+
+--Question 1
+SELECT
+  COUNT(order_id)
+FROM pizza_runner.customer_orders;
+
+--Question 2
+
+SELECT
+  COUNT (DISTINCT order_id)
+FROM pizza_runner.customer_orders;
+
+--Question 3
+SELECT
+  runner_id,
+  COUNT(order_id)
+FROM pizza_runner.runner_orders
+GROUP BY runner_id;
+
+--Question 4
+SELECT
+  pizza_names.pizza_name AS pizza_type,
+  COUNT(customer_orders.order_id) AS delivery_count
+FROM pizza_runner.customer_orders customer_orders
+INNER JOIN pizza_runner.pizza_names pizza_names
+ON customer_orders.pizza_id = pizza_names.pizza_id
+GROUP BY pizza_type;
+
+--Question 5
+SELECT
+  customer_orders.customer_id AS customer,
+  pizza_names.pizza_name AS pizza_type,
+  COUNT(customer_orders.order_id) AS delivery_count
+FROM pizza_runner.customer_orders customer_orders
+INNER JOIN pizza_runner.pizza_names pizza_names
+ON customer_orders.pizza_id = pizza_names.pizza_id
+GROUP BY customer, pizza_type
+ORDER BY customer;
+
+--Question 6
