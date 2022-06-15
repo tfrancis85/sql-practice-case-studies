@@ -39,7 +39,9 @@ SELECT
 FROM pizza_runner.customer_orders customer_orders
 INNER JOIN pizza_runner.pizza_names pizza_names
 ON customer_orders.pizza_id = pizza_names.pizza_id
-WHERE distance <> 'null'
+INNER JOIN pizza_runner.runner_orders r
+ON customer_orders.order_id = r.order_id
+WHERE r.distance <> 'null'
 GROUP BY pizza_type;
 
 --Question 5
@@ -52,6 +54,7 @@ INNER JOIN pizza_runner.pizza_names pizza_names
 ON customer_orders.pizza_id = pizza_names.pizza_id
 GROUP BY customer, pizza_type
 ORDER BY customer;
+
 
 --Question 6
 WITH pizza_count AS (
@@ -76,11 +79,12 @@ ORDER BY max_delivery DESC;
 
 --Question 8
 SELECT
-  COUNT(CASE WHEN c.exclusions IS NOT NULL AND c.extras IS NOT NULL THEN 1 ELSE 0 END ) AS change_count
+  SUM(CASE WHEN c.exclusions IS NOT NULL AND c.extras IS NOT NULL THEN 1 ELSE 0 END ) AS change_count
 FROM pizza_runner.customer_orders c
 INNER JOIN pizza_runner.runner_orders r
 ON c.order_id = r.order_id
 WHERE distance <> 'null';
+
 
 --Question 9
 SELECT EXTRACT('hour' FROM order_time) AS hour,
@@ -95,3 +99,6 @@ COUNT(order_id)
 FROM pizza_runner.customer_orders
 GROUP BY day_of_week
 ORDER BY day_of_week;
+
+--This solution does not use the TO_CHAR function which would convert TIMESTAMP to STRING
+--Technically not the right solution from case study solutions
