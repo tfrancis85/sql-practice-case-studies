@@ -102,5 +102,3 @@ ORDER BY day_of_week;
 
 --This solution does not use the TO_CHAR function which would convert TIMESTAMP to STRING
 --Technically not the right solution from case study solutions
-
-lets see 
