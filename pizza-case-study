@@ -1,11 +1,11 @@
 --Serious sql Pizza case study
 /*
 A. Pizza Metrics
-How many pizzas were ordered?
-How many unique customer orders were made?
-How many successful orders were delivered by each runner?
-How many of each type of pizza was delivered?
-How many Vegetarian and Meatlovers were ordered by each customer?
+1.How many pizzas were ordered?
+2.How many unique customer orders were made?
+3.How many successful orders were delivered by each runner?
+4.How many of each type of pizza was delivered?
+5.How many Vegetarian and Meatlovers were ordered by each customer?
 What was the maximum number of pizzas delivered in a single order?
 For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 How many pizzas were delivered that had both exclusions and extras?
@@ -29,6 +29,7 @@ SELECT
   runner_id,
   COUNT(order_id)
 FROM pizza_runner.runner_orders
+WHERE distance <> 'null'
 GROUP BY runner_id;
 
 --Question 4
@@ -38,6 +39,7 @@ SELECT
 FROM pizza_runner.customer_orders customer_orders
 INNER JOIN pizza_runner.pizza_names pizza_names
 ON customer_orders.pizza_id = pizza_names.pizza_id
+WHERE distance <> 'null'
 GROUP BY pizza_type;
 
 --Question 5
@@ -52,3 +54,44 @@ GROUP BY customer, pizza_type
 ORDER BY customer;
 
 --Question 6
+WITH pizza_count AS (
+SELECT
+  customer_orders.order_id AS order_id,
+  COUNT(customer_orders.pizza_id) AS pizza_count
+FROM pizza_runner.customer_orders customer_orders
+INNER JOIN pizza_runner.runner_orders runner_orders
+ON customer_orders.order_id = runner_orders.order_id
+WHERE distance <> 'null'
+GROUP BY customer_orders.order_id
+)
+
+SELECT
+  order_id,
+  MAX(pizza_count) AS max_delivery
+FROM pizza_count
+GROUP BY order_id
+ORDER BY max_delivery DESC;
+
+--Question 7
+
+--Question 8
+SELECT
+  COUNT(CASE WHEN c.exclusions IS NOT NULL AND c.extras IS NOT NULL THEN 1 ELSE 0 END ) AS change_count
+FROM pizza_runner.customer_orders c
+INNER JOIN pizza_runner.runner_orders r
+ON c.order_id = r.order_id
+WHERE distance <> 'null';
+
+--Question 9
+SELECT EXTRACT('hour' FROM order_time) AS hour,
+COUNT(order_id)
+FROM pizza_runner.customer_orders
+GROUP BY hour
+ORDER BY hour;
+
+--Question 10
+SELECT EXTRACT('dow' FROM order_time) AS day_of_week,
+COUNT(order_id)
+FROM pizza_runner.customer_orders
+GROUP BY day_of_week
+ORDER BY day_of_week;
